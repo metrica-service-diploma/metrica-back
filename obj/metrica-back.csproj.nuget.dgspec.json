@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "A:\\University\\7th_Semester\\Diploma Thesis\\Repos\\metrica-back\\metrica-back.csproj": {}
+    "A:\\University\\Diploma Thesis\\Repos\\metrica-back\\metrica-back.csproj": {}
   },
   "projects": {
-    "A:\\University\\7th_Semester\\Diploma Thesis\\Repos\\metrica-back\\metrica-back.csproj": {
+    "A:\\University\\Diploma Thesis\\Repos\\metrica-back\\metrica-back.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "A:\\University\\7th_Semester\\Diploma Thesis\\Repos\\metrica-back\\metrica-back.csproj",
+        "projectUniqueName": "A:\\University\\Diploma Thesis\\Repos\\metrica-back\\metrica-back.csproj",
         "projectName": "metrica-back",
-        "projectPath": "A:\\University\\7th_Semester\\Diploma Thesis\\Repos\\metrica-back\\metrica-back.csproj",
+        "projectPath": "A:\\University\\Diploma Thesis\\Repos\\metrica-back\\metrica-back.csproj",
         "packagesPath": "C:\\Users\\basil\\.nuget\\packages\\",
-        "outputPath": "A:\\University\\7th_Semester\\Diploma Thesis\\Repos\\metrica-back\\obj\\",
+        "outputPath": "A:\\University\\Diploma Thesis\\Repos\\metrica-back\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\basil\\AppData\\Roaming\\NuGet\\NuGet.Config"
@@ -37,6 +37,32 @@
       "frameworks": {
         "net8.0": {
           "targetAlias": "net8.0",
+          "dependencies": {
+            "AutoMapper": {
+              "target": "Package",
+              "version": "[12.0.1, )"
+            },
+            "AutoMapper.Extensions.Microsoft.DependencyInjection": {
+              "target": "Package",
+              "version": "[12.0.1, )"
+            },
+            "BCrypt.Net-Next": {
+              "target": "Package",
+              "version": "[4.0.3, )"
+            },
+            "Npgsql.EntityFrameworkCore.PostgreSQL": {
+              "target": "Package",
+              "version": "[8.0.8, )"
+            },
+            "Swashbuckle.AspNetCore": {
+              "target": "Package",
+              "version": "[9.0.6, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[8.14.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",

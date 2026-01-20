@@ -11,4 +11,12 @@ namespace metrica_back.Mappings
             CreateMap<User, UserResponseDto>();
         }
     }
+
+    public class WebsiteMappingProfile : Profile
+    {
+        public WebsiteMappingProfile()
+        {
+            CreateMap<Website, WebsiteResponseDto>();
+        }
+    }
 }

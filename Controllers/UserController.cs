@@ -12,7 +12,7 @@ namespace metrica_back.Controllers
     [Route("api/auth")]
     public class UserController(
         IUserRepository userRepository,
-        IAuthService authService,
+        JwtTokenService jwtTokenService,
         IMapper mapper
     )
     {
@@ -29,18 +29,20 @@ namespace metrica_back.Controllers
                     new { message = "User with such username or email already exists" }
                 );
 
-            User createdUser = await userRepository.CreateUserAsync(
-                new()
-                {
-                    Id = Guid.NewGuid(),
-                    UserName = signUpRequestDto.UserName,
-                    Email = signUpRequestDto.Email,
-                    PasswordHash = PasswordHasher.HashPassword(signUpRequestDto.Password),
-                    CreatedAt = DateTime.UtcNow,
-                }
+            return Results.Ok(
+                mapper.Map<User, UserResponseDto>(
+                    await userRepository.CreateUserAsync(
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            UserName = signUpRequestDto.UserName,
+                            Email = signUpRequestDto.Email,
+                            PasswordHash = PasswordHasher.HashPassword(signUpRequestDto.Password),
+                            CreatedAt = DateTime.UtcNow,
+                        }
+                    )
+                )
             );
-
-            return Results.Ok(mapper.Map<User, UserResponseDto>(createdUser));
         }
 
         [HttpPost("sign-in")]
@@ -54,13 +56,11 @@ namespace metrica_back.Controllers
             if (!PasswordHasher.VerifyPassword(signInRequestDto.Password, user.PasswordHash))
                 return Results.Unauthorized();
 
-            string jwtToken = authService.GenerateJwtToken(user);
-
             return Results.Ok(
                 new SignInResponseDto()
                 {
                     User = mapper.Map<User, UserResponseDto>(user),
-                    JwtToken = jwtToken,
+                    JwtToken = jwtTokenService.GetJwtSecurityToken(user),
                 }
             );
         }

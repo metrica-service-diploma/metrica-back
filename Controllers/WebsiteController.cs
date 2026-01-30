@@ -1,3 +1,4 @@
+using AutoMapper;
 using metrica_back.Dto;
 using metrica_back.Models;
 using metrica_back.Repositories;
@@ -10,7 +11,11 @@ namespace metrica_back.Controllers
     [ApiController]
     [Route("api/websites")]
     [Authorize]
-    public class WebsiteController(IWebsiteRepository websiteRepository, UserService userService)
+    public class WebsiteController(
+        IWebsiteRepository websiteRepository,
+        IUserService userService,
+        IMapper mapper
+    )
     {
         [HttpGet]
         public async Task<IResult> GetUserWebsites()
@@ -20,7 +25,11 @@ namespace metrica_back.Controllers
             if (userId == null)
                 return Results.Unauthorized();
 
-            return Results.Ok(await websiteRepository.GetUserWebsitesAsync((Guid)userId));
+            return Results.Ok(
+                mapper.Map<List<WebsiteResponseDto>>(
+                    await websiteRepository.GetUserWebsitesAsync((Guid)userId)
+                )
+            );
         }
 
         [HttpGet("{id::guid}")]
@@ -36,7 +45,7 @@ namespace metrica_back.Controllers
             if (userId != website.UserId)
                 return Results.Forbid();
 
-            return Results.Ok(website);
+            return Results.Ok(mapper.Map<Website, WebsiteResponseDto>(website));
         }
 
         [HttpPost]
@@ -60,16 +69,18 @@ namespace metrica_back.Controllers
                 );
 
             return Results.Ok(
-                await websiteRepository.CreateWebsiteAsync(
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = createWebsiteRequestDto.Name,
-                        Domain = createWebsiteRequestDto.Domain,
-                        TrackingCode = await websiteRepository.GetTrackingCode(),
-                        CreatedAt = DateTime.UtcNow,
-                        UserId = (Guid)userId,
-                    }
+                mapper.Map<Website, WebsiteResponseDto>(
+                    await websiteRepository.CreateWebsiteAsync(
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Name = createWebsiteRequestDto.Name,
+                            Domain = createWebsiteRequestDto.Domain,
+                            TrackingCode = await websiteRepository.GetTrackingCode(),
+                            CreatedAt = DateTime.UtcNow,
+                            UserId = (Guid)userId,
+                        }
+                    )
                 )
             );
         }

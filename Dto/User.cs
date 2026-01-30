@@ -24,6 +24,6 @@ namespace metrica_back.Dto
     public class SignInResponseDto
     {
         public UserResponseDto User { get; set; }
-        public string JwtToken { get; set; }
+        public string AccessToken { get; set; }
     }
 }

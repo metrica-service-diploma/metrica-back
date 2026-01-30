@@ -9,6 +9,14 @@ using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(opts =>
+{
+    opts.AddDefaultPolicy(policy =>
+    {
+        policy.WithMethods(["GET", "POST", "PUT", "DELETE"]).AllowAnyOrigin().AllowAnyHeader();
+    });
+});
+
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers();
@@ -83,9 +91,11 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IWebsiteRepository, WebsiteRepository>();
-builder.Services.AddScoped<JwtTokenService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
+
+app.UseCors();
 
 app.UseRouting();
 

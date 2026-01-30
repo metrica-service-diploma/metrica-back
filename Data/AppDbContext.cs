@@ -26,7 +26,6 @@ namespace metrica_back.Data
 
         private static void SeedData(ModelBuilder modelBuilder)
         {
-            // Создание пользователей
             var users = new[]
             {
                 new User

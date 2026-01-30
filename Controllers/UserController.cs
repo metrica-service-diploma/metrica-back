@@ -12,7 +12,7 @@ namespace metrica_back.Controllers
     [Route("api/auth")]
     public class UserController(
         IUserRepository userRepository,
-        JwtTokenService jwtTokenService,
+        IUserService userService,
         IMapper mapper
     )
     {
@@ -60,7 +60,7 @@ namespace metrica_back.Controllers
                 new SignInResponseDto()
                 {
                     User = mapper.Map<User, UserResponseDto>(user),
-                    JwtToken = jwtTokenService.GetJwtSecurityToken(user),
+                    AccessToken = userService.GetJwtSecurityToken(user),
                 }
             );
         }

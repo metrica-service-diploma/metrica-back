@@ -16,7 +16,10 @@ namespace metrica_back.Repositories
     public class WebsiteRepository(AppDbContext appDbContext) : IWebsiteRepository
     {
         public async Task<List<Website>> GetUserWebsitesAsync(Guid userId) =>
-            await appDbContext.Websites.Where(website => website.UserId == userId).ToListAsync();
+            await appDbContext
+                .Websites.Where(website => website.UserId == userId)
+                .OrderBy(website => website.TrackingCode)
+                .ToListAsync();
 
         public async Task<Website?> GetWebsiteByIdAsync(Guid id) =>
             await appDbContext.Websites.FirstOrDefaultAsync(website => website.Id == id);

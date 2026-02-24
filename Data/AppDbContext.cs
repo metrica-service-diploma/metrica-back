@@ -15,11 +15,19 @@ namespace metrica_back.Data
             : base(options)
         {
             Database.EnsureCreated();
+            // Database.EnsureDeleted();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder
+                .Entity<User>()
+                .HasMany(u => u.Websites)
+                .WithOne(w => w.User)
+                .HasForeignKey(w => w.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             SeedData(modelBuilder);
         }
@@ -53,6 +61,8 @@ namespace metrica_back.Data
                     PasswordHash = PasswordHasher.HashPassword("Qwerty!123"),
                 },
             };
+
+            modelBuilder.Entity<User>().HasData(users);
 
             var websites = new[]
             {
@@ -139,7 +149,6 @@ namespace metrica_back.Data
                 },
             };
 
-            modelBuilder.Entity<User>().HasData(users);
             modelBuilder.Entity<Website>().HasData(websites);
         }
     }

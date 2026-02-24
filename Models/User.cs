@@ -7,5 +7,7 @@ namespace metrica_back.Models
         public string Email { get; set; }
         public string PasswordHash { get; set; }
         public DateTime CreatedAt { get; set; }
+
+        public List<Website> Websites { get; set; }
     }
 }

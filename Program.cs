@@ -84,16 +84,23 @@ Console.WriteLine(
     $"db connection string: {builder.Configuration.GetConnectionString("DefaultConnection")}"
 );
 
-// Добавление контекста базы данных
+// Добавление контекстов баз данных
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
+builder.Services.AddSingleton<ClickHouseContext>();
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IWebsiteRepository, WebsiteRepository>();
+builder.Services.AddScoped<ITrackingEventRepository, TrackingEventRepository>();
+
 builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
+
+// Инициализация контекста БД ClickHouse
+var context = app.Services.GetRequiredService<ClickHouseContext>();
+await context.InitializeAsync();
 
 app.UseCors();
 

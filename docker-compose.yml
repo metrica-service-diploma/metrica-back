@@ -1,0 +1,80 @@
+name: metrica-back
+
+services:
+  api:
+    container_name: metrica-back
+    build:
+      context: .
+      target: final
+    ports:
+      - 5193:8080
+    depends_on:
+      db:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+  db:
+    container_name: metrica-back-db
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: metricabackdb
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  clickhouse:
+    container_name: metrica-back-clickhouse
+    image: clickhouse/clickhouse-server:latest
+    ports:
+      - 8123:8123 # HTTP API
+      - 9000:9000 # Native protocol
+      - 9009:9009 # Inter-server communication
+      - 9440:9440 # Native protocol with SSL
+    environment:
+      CLICKHOUSE_USER: default
+      CLICKHOUSE_PASSWORD: password123
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+  redis:
+    container_name: metrica-back-redis
+    image: redis:7-alpine
+    ports:
+      - 6379:6379
+    command: redis-server --requirepass redis_password --appendonly yes
+    environment:
+      REDIS_PASSWORD: redis_password
+      REDIS_DATABASES: 16
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redis_password", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+  rabbitmq:
+    container_name: metrica-back-rabbitmq
+    image: rabbitmq:3-management-alpine
+    ports:
+      - 5672:5672 # AMQP protocol
+      - 15672:15672 # Management UI
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5

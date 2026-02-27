@@ -98,6 +98,10 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 
+Console.WriteLine(
+    $"clickhouse connection string: {builder.Configuration.GetConnectionString("ClickHouseConnection")}"
+);
+
 // Инициализация контекста БД ClickHouse
 var context = app.Services.GetRequiredService<ClickHouseContext>();
 await context.InitializeAsync();

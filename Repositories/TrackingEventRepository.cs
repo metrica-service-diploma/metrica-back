@@ -1,8 +1,8 @@
-using System.Data;
-using AutoMapper;
 using ClickHouse.Driver.ADO.Parameters;
 using ClickHouse.Driver.Utility;
 using metrica_back.Data;
+using metrica_back.Dto;
+using metrica_back.Helpers;
 using metrica_back.Models;
 
 // TODO: Конкретизировать типы параметров в query (для производительности)
@@ -13,16 +13,20 @@ namespace metrica_back.Repositories
     public interface ITrackingEventRepository
     {
         Task CreateTrackingEventAsync(TrackingEvent trackingEvent);
-        Task<IEnumerable<TrackingEvent>> GetTrackingEventsByWebsiteIdAsync(
+        Task<int> GetTotalPageViewsAsync(
             Guid websiteId,
             DateTime? from = null,
             DateTime? to = null
         );
-        Task<IEnumerable<TrackingEvent>> GetTrackingEventsBySessionIdAsync(Guid sessionId);
+        Task<List<IntervalPageViews>> GetIntervalPageViewsAsync(
+            Guid websiteId,
+            DateTime? from,
+            DateTime? to,
+            IntervalType? interval
+        );
     }
 
-    public class TrackingEventRepository(ClickHouseContext context, IMapper mapper)
-        : ITrackingEventRepository
+    public class TrackingEventRepository(ClickHouseContext context) : ITrackingEventRepository
     {
         public async Task CreateTrackingEventAsync(TrackingEvent trackingEvent)
         {
@@ -67,7 +71,7 @@ namespace metrica_back.Repositories
             await client.ExecuteNonQueryAsync(query, parameters);
         }
 
-        public async Task<IEnumerable<TrackingEvent>> GetTrackingEventsByWebsiteIdAsync(
+        public async Task<int> GetTotalPageViewsAsync(
             Guid websiteId,
             DateTime? from = null,
             DateTime? to = null
@@ -77,11 +81,16 @@ namespace metrica_back.Repositories
 
             var query =
                 @"
-                SELECT * FROM metrics.tracking_events 
-                WHERE WebsiteId = toString(@websiteId)
-                AND (@from IS NULL OR Timestamp >= @from)
-                AND (@to IS NULL OR Timestamp <= @to)
-                ORDER BY Timestamp DESC";
+                SELECT 
+                    WebsiteId,
+                    count(*) as TotalPageViews
+                FROM metrics.tracking_events
+                WHERE 
+                    WebsiteId = toString(@websiteId) 
+                    AND EventType = 'page_view'
+                    AND (@from IS NULL OR Timestamp >= @from)
+                    AND (@to IS NULL OR Timestamp <= @to)
+                GROUP BY WebsiteId";
 
             var parameters = new ClickHouseParameterCollection();
 
@@ -90,40 +99,66 @@ namespace metrica_back.Repositories
             parameters.AddParameter("to", to);
 
             var reader = await client.ExecuteReaderAsync(query, parameters);
+            if (!await reader.ReadAsync())
+                return 0;
 
-            var results = new List<TrackingEvent>();
-            while (await reader.ReadAsync())
-            {
-                results.Add(mapper.Map<IDataReader, TrackingEvent>(reader));
-            }
-
-            return results;
+            return Convert.ToInt32(reader["TotalPageViews"]);
         }
 
-        public async Task<IEnumerable<TrackingEvent>> GetTrackingEventsBySessionIdAsync(
-            Guid sessionId
+        public async Task<List<IntervalPageViews>> GetIntervalPageViewsAsync(
+            Guid websiteId,
+            DateTime? from = null,
+            DateTime? to = null,
+            IntervalType? interval = IntervalType.Weeks
         )
         {
             using var client = context.GetClient();
 
+            var (intervalValue, intervalType) = TrackingEventsHelper.GetIntervalParameters(
+                interval ?? IntervalType.Weeks
+            );
+
             var query =
-                @"
-                SELECT * FROM metrics.tracking_events 
-                WHERE SessionId = toString(@sessionId) 
-                ORDER BY Timestamp";
+                $@"
+                SELECT 
+                    WebsiteId,
+                    toStartOfInterval(Timestamp, INTERVAL {intervalValue} {intervalType}) as IntervalStart,
+                    toStartOfInterval(Timestamp, INTERVAL {intervalValue} {intervalType}) + INTERVAL {intervalValue} {intervalType} as IntervalEnd,
+                    count(*) as PageViews
+                FROM metrics.tracking_events
+                WHERE 
+                    WebsiteId = toString(@websiteId) 
+                    AND EventType = 'page_view'
+                    AND (@from IS NULL OR Timestamp >= @from)
+                    AND (@to IS NULL OR Timestamp <= @to)
+                GROUP BY WebsiteId, IntervalStart, IntervalEnd
+                ORDER BY IntervalStart";
 
             var parameters = new ClickHouseParameterCollection();
-            parameters.AddParameter("sessionId", sessionId);
+
+            parameters.AddParameter("websiteId", websiteId);
+            parameters.AddParameter("from", from);
+            parameters.AddParameter("to", to);
+
+            parameters.AddParameter("intervalValue", intervalValue);
+            parameters.AddParameter("intervalType", intervalType);
 
             var reader = await client.ExecuteReaderAsync(query, parameters);
+            var result = new List<IntervalPageViews>();
 
-            var results = new List<TrackingEvent>();
             while (await reader.ReadAsync())
             {
-                results.Add(mapper.Map<IDataReader, TrackingEvent>(reader));
+                result.Add(
+                    new IntervalPageViews
+                    {
+                        PageViews = Convert.ToInt32(reader["PageViews"]),
+                        StartDate = Convert.ToDateTime(reader["IntervalStart"]),
+                        EndDate = Convert.ToDateTime(reader["IntervalEnd"]),
+                    }
+                );
             }
 
-            return results;
+            return result;
         }
     }
 }

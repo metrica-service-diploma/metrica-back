@@ -14,4 +14,30 @@ namespace metrica_back.Dto
         public int ScreenHeight { get; set; }
         public string BrowserLanguage { get; set; }
     }
+
+    public enum IntervalType
+    {
+        Days,
+        Weeks,
+        Months,
+    }
+
+    public class TotalPageViews
+    {
+        public int PageViews { get; set; }
+    }
+
+    public class IntervalPageViews
+    {
+        public int PageViews { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+    }
+
+    public class PageViewsResponseDto
+    {
+        public Guid WebsiteId { get; set; }
+        public int TotalPageViews { get; set; }
+        public List<IntervalPageViews> IntervalPageViews { get; set; }
+    }
 }

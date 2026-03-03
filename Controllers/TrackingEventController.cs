@@ -4,6 +4,8 @@ using metrica_back.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+// TODO: Добавить кеширование результатов аналитических запросов в Redis
+
 namespace metrica_back.Controllers
 {
     [ApiController]
@@ -35,26 +37,33 @@ namespace metrica_back.Controllers
             return Results.Ok(trackingEvent);
         }
 
-        [HttpGet("website/{websiteId}")]
-        public async Task<IResult> GetTrackingEventsByWebsiteId(
+        [HttpGet("website/{websiteId}/page-views")]
+        public async Task<IResult> GetPageViews(
             Guid websiteId,
             [FromQuery] DateTime? from = null,
-            [FromQuery] DateTime? to = null
+            [FromQuery] DateTime? to = null,
+            [FromQuery] IntervalType? interval = null
         )
         {
-            var events = await trackingEventRepository.GetTrackingEventsByWebsiteIdAsync(
+            var totalPageViews = await trackingEventRepository.GetTotalPageViewsAsync(
                 websiteId,
                 from,
                 to
             );
-            return Results.Ok(events);
-        }
-
-        [HttpGet("session/{sessionId}")]
-        public async Task<IResult> GetTrackingEventsBySessionId(Guid sessionId)
-        {
-            var events = await trackingEventRepository.GetTrackingEventsBySessionIdAsync(sessionId);
-            return Results.Ok(events);
+            var intervalPageViews = await trackingEventRepository.GetIntervalPageViewsAsync(
+                websiteId,
+                from,
+                to,
+                interval
+            );
+            return Results.Ok(
+                new PageViewsResponseDto()
+                {
+                    WebsiteId = websiteId,
+                    TotalPageViews = totalPageViews,
+                    IntervalPageViews = intervalPageViews,
+                }
+            );
         }
     }
 }

@@ -7,7 +7,9 @@ services:
       context: .
       target: final
     ports:
-      - 5193:8080
+      - "5193:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
     depends_on:
       db:
         condition: service_healthy
@@ -17,64 +19,102 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - metrica-network
+
   db:
     container_name: metrica-back-db
-    image: postgres:latest
+    image: postgres:16-alpine
     ports:
-      - 5432:5432
+      - "5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: metricabackdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d metricabackdb"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - metrica-network
+
   clickhouse:
     container_name: metrica-back-clickhouse
     image: clickhouse/clickhouse-server:latest
     ports:
-      - 8123:8123 # HTTP API
-      - 9000:9000 # Native protocol
-      - 9009:9009 # Inter-server communication
-      - 9440:9440 # Native protocol with SSL
+      - "8123:8123"
+      - "9000:9000"
     environment:
       CLICKHOUSE_USER: default
       CLICKHOUSE_PASSWORD: password123
       CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
-      interval: 5s
+      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+      interval: 10s
       timeout: 5s
-      retries: 10
-      start_period: 10s
+      retries: 5
+      start_period: 15s
+    restart: unless-stopped
+    networks:
+      - metrica-network
+
   redis:
     container_name: metrica-back-redis
-    image: redis:7-alpine
+    image: redis:7.4-alpine
     ports:
-      - 6379:6379
+      - "6379:6379"
     command: redis-server --requirepass redis_password --appendonly yes
-    environment:
-      REDIS_PASSWORD: redis_password
-      REDIS_DATABASES: 16
+    volumes:
+      - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "redis_password", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
+    restart: unless-stopped
+    networks:
+      - metrica-network
+
   rabbitmq:
     container_name: metrica-back-rabbitmq
-    image: rabbitmq:3-management-alpine
+    image: rabbitmq:3.13-management-alpine
     ports:
-      - 5672:5672 # AMQP protocol
-      - 15672:15672 # Management UI
+      - "5672:5672"
+      - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+    networks:
+      - metrica-network
+
+volumes:
+  postgres_data:
+    driver: local
+  clickhouse_data:
+    driver: local
+  redis_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+
+networks:
+  metrica-network:
+    driver: bridge

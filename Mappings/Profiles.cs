@@ -1,4 +1,3 @@
-using System.Data;
 using AutoMapper;
 using metrica_back.Dto;
 using metrica_back.Models;

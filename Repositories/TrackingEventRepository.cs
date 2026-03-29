@@ -26,31 +26,35 @@ namespace metrica_back.Repositories
         );
     }
 
-    public class TrackingEventRepository(ClickHouseContext context) : ITrackingEventRepository
+    public class TrackingEventRepository(IConfiguration config, ClickHouseContext context)
+        : ITrackingEventRepository
     {
+        private readonly string databaseName = config["ClickHouse:DatabaseName"];
+        private readonly string tableName = config["ClickHouse:TableName"];
+
         public async Task CreateTrackingEventAsync(TrackingEvent trackingEvent)
         {
             using var client = context.GetClient();
 
             var query =
-                @"
-                INSERT INTO metrics.tracking_events (
+                $@"
+                INSERT INTO {databaseName}.{tableName} (
                     Id, SessionId, WebsiteId, EventType, Timestamp, 
                     PageUrl, PageTitle, Referrer, UserAgent, 
                     ScreenWidth, ScreenHeight, BrowserLanguage
                 ) VALUES (
-                    {id: String}, 
-                    {sessionId: String}, 
-                    {websiteId: String}, 
-                    {eventType: String}, 
-                    {timestamp: DateTime}, 
-                    {pageUrl: String}, 
-                    {pageTitle: String}, 
-                    {referrer: String}, 
-                    {userAgent: String}, 
-                    {screenWidth: Int32}, 
-                    {screenHeight: Int32}, 
-                    {browserLanguage: String}
+                    @id, 
+                    @sessionId, 
+                    @websiteId, 
+                    @eventType, 
+                    @timestamp, 
+                    @pageUrl, 
+                    @pageTitle, 
+                    @referrer, 
+                    @userAgent, 
+                    @screenWidth, 
+                    @screenHeight, 
+                    @browserLanguage
                 )";
 
             var parameters = new ClickHouseParameterCollection();
@@ -80,11 +84,11 @@ namespace metrica_back.Repositories
             using var client = context.GetClient();
 
             var query =
-                @"
+                $@"
                 SELECT 
                     WebsiteId,
                     count(*) as TotalPageViews
-                FROM metrics.tracking_events
+                FROM {databaseName}.{tableName}
                 WHERE 
                     WebsiteId = toString(@websiteId) 
                     AND EventType = 'page_view'
@@ -125,7 +129,7 @@ namespace metrica_back.Repositories
                     toStartOfInterval(Timestamp, INTERVAL {intervalValue} {intervalType}) as IntervalStart,
                     toStartOfInterval(Timestamp, INTERVAL {intervalValue} {intervalType}) + INTERVAL {intervalValue} {intervalType} as IntervalEnd,
                     count(*) as PageViews
-                FROM metrics.tracking_events
+                FROM {databaseName}.{tableName}
                 WHERE 
                     WebsiteId = toString(@websiteId) 
                     AND EventType = 'page_view'
@@ -139,7 +143,6 @@ namespace metrica_back.Repositories
             parameters.AddParameter("websiteId", websiteId);
             parameters.AddParameter("from", from);
             parameters.AddParameter("to", to);
-
             parameters.AddParameter("intervalValue", intervalValue);
             parameters.AddParameter("intervalType", intervalType);
 

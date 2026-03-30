@@ -15,7 +15,7 @@ builder.Services.AddServices();
 
 var app = builder.Build();
 
-await app.InitializeClickHouseAsync();
+await app.InitializeAllDatabasesAsync();
 app.ConfigurePipeline();
 
 await app.RunAsync();

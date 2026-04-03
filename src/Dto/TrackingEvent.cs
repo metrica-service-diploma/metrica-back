@@ -32,7 +32,6 @@ public class IntervalPageViews
 
 public class PageViewsResponseDto
 {
-    public Guid WebsiteId { get; set; }
     public int TotalPageViews { get; set; }
     public List<IntervalPageViews> IntervalPageViews { get; set; }
 }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 // TODO: Добавить кеширование результатов аналитических запросов в Redis
+// TODO: Добавить авторизацию для владельца сайта
 
 namespace metrica_back.src.Controllers;
 
@@ -38,21 +39,21 @@ public class TrackingEventController(ITrackingEventRepository trackingEventRepos
         return Results.Ok(trackingEvent);
     }
 
-    [HttpGet("website/{websiteId}/page-views")]
+    [HttpGet("website/{trackingCode}/page-views")]
     public async Task<IResult> GetPageViews(
-        Guid websiteId,
+        int trackingCode,
         [FromQuery] DateTime? from = null,
         [FromQuery] DateTime? to = null,
         [FromQuery] IntervalType? interval = null
     )
     {
         var totalPageViews = await trackingEventRepository.GetTotalPageViewsAsync(
-            websiteId,
+            trackingCode,
             from,
             to
         );
         var intervalPageViews = await trackingEventRepository.GetIntervalPageViewsAsync(
-            websiteId,
+            trackingCode,
             from,
             to,
             interval
@@ -60,7 +61,6 @@ public class TrackingEventController(ITrackingEventRepository trackingEventRepos
         return Results.Ok(
             new PageViewsResponseDto()
             {
-                WebsiteId = websiteId,
                 TotalPageViews = totalPageViews,
                 IntervalPageViews = intervalPageViews,
             }

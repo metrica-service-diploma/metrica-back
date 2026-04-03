@@ -13,9 +13,9 @@ namespace metrica_back.src.Repositories;
 public interface ITrackingEventRepository
 {
     Task CreateTrackingEventAsync(TrackingEvent trackingEvent);
-    Task<int> GetTotalPageViewsAsync(Guid websiteId, DateTime? from = null, DateTime? to = null);
+    Task<int> GetTotalPageViewsAsync(int trackingCode, DateTime? from = null, DateTime? to = null);
     Task<List<IntervalPageViews>> GetIntervalPageViewsAsync(
-        Guid websiteId,
+        int trackingCode,
         DateTime? from,
         DateTime? to,
         IntervalType? interval
@@ -34,31 +34,22 @@ public class TrackingEventRepository(IConfiguration config, ClickHouseContext co
 
         var query =
             $@"
-                INSERT INTO {databaseName}.{tableName} (
-                    Id, ClientId, SessionId, TrackingCode, EventType, 
-                    Timestamp, PageUrl, PageTitle, Referrer, UserAgent, 
-                    ScreenWidth, ScreenHeight, BrowserLanguage
-                ) VALUES (
-                    @id, 
-                    @clientId,
-                    @sessionId, 
-                    @trackingCode, 
-                    @eventType, 
-                    @timestamp, 
-                    @pageUrl, 
-                    @pageTitle, 
-                    @referrer, 
-                    @userAgent, 
-                    @screenWidth, 
-                    @screenHeight, 
-                    @browserLanguage
-                )";
+            INSERT INTO {databaseName}.{tableName} (
+                Id, ClientId, SessionId, TrackingCode, EventType, 
+                Timestamp, PageUrl, PageTitle, Referrer, UserAgent, 
+                ScreenWidth, ScreenHeight, BrowserLanguage
+            ) VALUES (
+                @id, @clientId, @sessionId, @trackingCode, @eventType, 
+                @timestamp, @pageUrl, @pageTitle, @referrer, @userAgent, 
+                @screenWidth, @screenHeight, @browserLanguage
+            )";
 
         var parameters = new ClickHouseParameterCollection();
 
         parameters.AddParameter("id", trackingEvent.Id);
         parameters.AddParameter("clientId", trackingEvent.ClientId);
         parameters.AddParameter("sessionId", trackingEvent.SessionId);
+        parameters.AddParameter("trackingCode", trackingEvent.TrackingCode);
         parameters.AddParameter("eventType", trackingEvent.EventType);
         parameters.AddParameter("timestamp", trackingEvent.Timestamp);
         parameters.AddParameter("pageUrl", trackingEvent.PageUrl);
@@ -73,7 +64,7 @@ public class TrackingEventRepository(IConfiguration config, ClickHouseContext co
     }
 
     public async Task<int> GetTotalPageViewsAsync(
-        Guid websiteId,
+        int trackingCode,
         DateTime? from = null,
         DateTime? to = null
     )
@@ -82,20 +73,18 @@ public class TrackingEventRepository(IConfiguration config, ClickHouseContext co
 
         var query =
             $@"
-                SELECT 
-                    WebsiteId,
-                    count(*) as TotalPageViews
-                FROM {databaseName}.{tableName}
-                WHERE 
-                    WebsiteId = toString(@websiteId) 
-                    AND EventType = 'page_view'
-                    AND (@from IS NULL OR Timestamp >= @from)
-                    AND (@to IS NULL OR Timestamp <= @to)
-                GROUP BY WebsiteId";
+            SELECT COUNT(*) as TotalPageViews
+            FROM {databaseName}.{tableName}
+            WHERE
+                TrackingCode = @trackingCode
+                AND EventType = 'page_view'
+                AND (@from IS NULL OR Timestamp >= @from)
+                AND (@to IS NULL OR Timestamp <= @to)
+            GROUP BY TrackingCode";
 
         var parameters = new ClickHouseParameterCollection();
 
-        parameters.AddParameter("websiteId", websiteId);
+        parameters.AddParameter("trackingCode", trackingCode);
         parameters.AddParameter("from", from);
         parameters.AddParameter("to", to);
 
@@ -107,7 +96,7 @@ public class TrackingEventRepository(IConfiguration config, ClickHouseContext co
     }
 
     public async Task<List<IntervalPageViews>> GetIntervalPageViewsAsync(
-        Guid websiteId,
+        int trackingCode,
         DateTime? from = null,
         DateTime? to = null,
         IntervalType? interval = IntervalType.Weeks
@@ -119,27 +108,25 @@ public class TrackingEventRepository(IConfiguration config, ClickHouseContext co
             interval ?? IntervalType.Weeks
         );
 
-        // TODO: Придумать че делать с websiteId
-
         var query =
             $@"
-                SELECT 
-                    WebsiteId,
-                    toStartOfInterval(Timestamp, INTERVAL {intervalValue} {intervalType}) as IntervalStart,
-                    toStartOfInterval(Timestamp, INTERVAL {intervalValue} {intervalType}) + INTERVAL {intervalValue} {intervalType} as IntervalEnd,
-                    count(*) as PageViews
-                FROM {databaseName}.{tableName}
-                WHERE 
-                    WebsiteId = toString(@websiteId) 
-                    AND EventType = 'page_view'
-                    AND (@from IS NULL OR Timestamp >= @from)
-                    AND (@to IS NULL OR Timestamp <= @to)
-                GROUP BY WebsiteId, IntervalStart, IntervalEnd
-                ORDER BY IntervalStart";
+            SELECT 
+                toStartOfInterval(Timestamp, INTERVAL {intervalValue} {intervalType}) as IntervalStart,
+                toStartOfInterval(Timestamp, INTERVAL {intervalValue} {intervalType}) 
+                    + INTERVAL {intervalValue} {intervalType} as IntervalEnd,
+                COUNT(*) as PageViews
+            FROM {databaseName}.{tableName}
+            WHERE 
+                TrackingCode = @trackingCode
+                AND EventType = 'page_view'
+                AND (@from IS NULL OR Timestamp >= @from)
+                AND (@to IS NULL OR Timestamp <= @to)
+            GROUP BY IntervalStart, IntervalEnd
+            ORDER BY IntervalStart";
 
         var parameters = new ClickHouseParameterCollection();
 
-        parameters.AddParameter("websiteId", websiteId);
+        parameters.AddParameter("trackingCode", trackingCode);
         parameters.AddParameter("from", from);
         parameters.AddParameter("to", to);
         parameters.AddParameter("intervalValue", intervalValue);

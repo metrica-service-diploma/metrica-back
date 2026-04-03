@@ -1,4 +1,4 @@
-using metrica_back.Extensions;
+using metrica_back.src.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 

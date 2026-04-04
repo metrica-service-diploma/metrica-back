@@ -42,13 +42,41 @@ public static class TestData
         },
     ];
 
+    private static readonly List<Guid> ClientIds =
+    [
+        Guid.NewGuid(), // ClientId[0] - Постоянный посетитель Windows
+        Guid.NewGuid(), // ClientId[1] - Постоянный посетитель Mac
+        Guid.NewGuid(), // ClientId[2] - Постоянный посетитель iPhone
+        Guid.NewGuid(), // ClientId[3] - Гостевой посетитель
+    ];
+
+    // Список SessionId (разные сессии)
+    private static readonly List<Guid> SessionIds =
+    [
+        Guid.NewGuid(), // SessionIds[0] - Win, магазин, день1
+        Guid.NewGuid(), // SessionIds[1] - Win, магазин, день2
+        Guid.NewGuid(), // SessionIds[2] - Mac, магазин
+        Guid.NewGuid(), // SessionIds[3] - iPhone, магазин
+        Guid.NewGuid(), // SessionIds[4] - Win, магазин, день3
+        Guid.NewGuid(), // SessionIds[5] - Mac, магазин, день2
+        Guid.NewGuid(), // SessionIds[6] - iPhone, магазин, день2
+        Guid.NewGuid(), // SessionIds[7] - Win, блог
+        Guid.NewGuid(), // SessionIds[8] - Mac, блог
+        Guid.NewGuid(), // SessionIds[9] - iPhone, блог
+        Guid.NewGuid(), // SessionIds[10] - Win, блог, день2
+        Guid.NewGuid(), // SessionIds[11] - Mac, блог, день2
+        Guid.NewGuid(), // SessionIds[12] - Гость, магазин, сегодня
+    ];
     public static readonly List<TrackingEvent> TrackingEvents =
     [
+        // ========== ИНТЕРНЕТ-МАГАЗИН ==========
+
+        // Сессия 0: Windows пользователь (ClientIds[0]), первый визит
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[0],
+            SessionId = SessionIds[0],
             TrackingCode = Websites[0].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddDays(-7).AddHours(10),
@@ -63,8 +91,8 @@ public static class TestData
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[0],
+            SessionId = SessionIds[0],
             TrackingCode = Websites[0].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddDays(-7).AddHours(10).AddMinutes(3),
@@ -79,8 +107,8 @@ public static class TestData
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[0],
+            SessionId = SessionIds[0],
             TrackingCode = Websites[0].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddDays(-7).AddHours(10).AddMinutes(7),
@@ -92,11 +120,45 @@ public static class TestData
             ScreenHeight = 1080,
             BrowserLanguage = "ru-RU",
         },
+        // Сессия 1: Windows пользователь (ClientIds[0]), второй визит
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[0],
+            SessionId = SessionIds[1],
+            TrackingCode = Websites[0].TrackingCode,
+            EventType = "page_view",
+            Timestamp = DateTime.UtcNow.AddDays(-4).AddHours(16).AddMinutes(45),
+            PageUrl = "https://shop.example.com/",
+            PageTitle = "Главная",
+            Referrer = "https://google.com",
+            UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            ScreenWidth = 1920,
+            ScreenHeight = 1080,
+            BrowserLanguage = "ru-RU",
+        },
+        new()
+        {
+            Id = Guid.NewGuid(),
+            ClientId = ClientIds[0],
+            SessionId = SessionIds[1],
+            TrackingCode = Websites[0].TrackingCode,
+            EventType = "page_view",
+            Timestamp = DateTime.UtcNow.AddDays(-4).AddHours(16).AddMinutes(48),
+            PageUrl = "https://shop.example.com/blog",
+            PageTitle = "Блог магазина",
+            Referrer = "https://shop.example.com/",
+            UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            ScreenWidth = 1920,
+            ScreenHeight = 1080,
+            BrowserLanguage = "ru-RU",
+        },
+        // Сессия 2: Mac пользователь (ClientIds[1])
+        new()
+        {
+            Id = Guid.NewGuid(),
+            ClientId = ClientIds[1],
+            SessionId = SessionIds[2],
             TrackingCode = Websites[0].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddDays(-6).AddHours(14).AddMinutes(30),
@@ -111,8 +173,8 @@ public static class TestData
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[1],
+            SessionId = SessionIds[2],
             TrackingCode = Websites[0].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddDays(-6).AddHours(14).AddMinutes(33),
@@ -124,11 +186,12 @@ public static class TestData
             ScreenHeight = 768,
             BrowserLanguage = "ru-RU",
         },
+        // Сессия 3: iPhone пользователь (ClientIds[2])
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[2],
+            SessionId = SessionIds[3],
             TrackingCode = Websites[0].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddDays(-5).AddHours(9).AddMinutes(15),
@@ -144,8 +207,8 @@ public static class TestData
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[2],
+            SessionId = SessionIds[3],
             TrackingCode = Websites[0].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddDays(-5).AddHours(9).AddMinutes(18),
@@ -161,8 +224,8 @@ public static class TestData
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[2],
+            SessionId = SessionIds[3],
             TrackingCode = Websites[0].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddDays(-5).AddHours(9).AddMinutes(22),
@@ -175,43 +238,29 @@ public static class TestData
             ScreenHeight = 844,
             BrowserLanguage = "en-US",
         },
+        // Сессия 4: Windows пользователь (ClientIds[0]), третий визит
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[0],
+            SessionId = SessionIds[4],
             TrackingCode = Websites[0].TrackingCode,
             EventType = "page_view",
-            Timestamp = DateTime.UtcNow.AddDays(-4).AddHours(16).AddMinutes(45),
+            Timestamp = DateTime.UtcNow.AddDays(-1).AddHours(15).AddMinutes(40),
             PageUrl = "https://shop.example.com/",
             PageTitle = "Главная",
-            Referrer = "https://google.com",
+            Referrer = null,
             UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
             ScreenWidth = 1920,
             ScreenHeight = 1080,
             BrowserLanguage = "ru-RU",
         },
+        // Сессия 5: Mac пользователь (ClientIds[1]), второй визит
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
-            TrackingCode = Websites[0].TrackingCode,
-            EventType = "page_view",
-            Timestamp = DateTime.UtcNow.AddDays(-4).AddHours(16).AddMinutes(48),
-            PageUrl = "https://shop.example.com/blog",
-            PageTitle = "Блог магазина",
-            Referrer = "https://shop.example.com/",
-            UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-            ScreenWidth = 1920,
-            ScreenHeight = 1080,
-            BrowserLanguage = "ru-RU",
-        },
-        new()
-        {
-            Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[1],
+            SessionId = SessionIds[5],
             TrackingCode = Websites[0].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddDays(-3).AddHours(11).AddMinutes(20),
@@ -226,8 +275,8 @@ public static class TestData
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[1],
+            SessionId = SessionIds[5],
             TrackingCode = Websites[0].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddDays(-3).AddHours(11).AddMinutes(24),
@@ -239,11 +288,12 @@ public static class TestData
             ScreenHeight = 768,
             BrowserLanguage = "ru-RU",
         },
+        // Сессия 6: iPhone пользователь (ClientIds[2]), второй визит
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[2],
+            SessionId = SessionIds[6],
             TrackingCode = Websites[0].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddDays(-2).AddHours(13).AddMinutes(10),
@@ -256,27 +306,12 @@ public static class TestData
             ScreenHeight = 844,
             BrowserLanguage = "en-US",
         },
+        // Сессия 12: Гостевой посетитель (ClientIds[3]), сегодня
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
-            TrackingCode = Websites[0].TrackingCode,
-            EventType = "page_view",
-            Timestamp = DateTime.UtcNow.AddDays(-1).AddHours(15).AddMinutes(40),
-            PageUrl = "https://shop.example.com/",
-            PageTitle = "Главная",
-            Referrer = null,
-            UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-            ScreenWidth = 1920,
-            ScreenHeight = 1080,
-            BrowserLanguage = "ru-RU",
-        },
-        new()
-        {
-            Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[3],
+            SessionId = SessionIds[12],
             TrackingCode = Websites[0].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddHours(-3),
@@ -288,11 +323,14 @@ public static class TestData
             ScreenHeight = 768,
             BrowserLanguage = "ru-RU",
         },
+        // ========== БЛОГ ==========
+
+        // Сессия 7: Windows пользователь (ClientIds[0]), блог
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[0],
+            SessionId = SessionIds[7],
             TrackingCode = Websites[1].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddDays(-6).AddHours(12).AddMinutes(0),
@@ -307,8 +345,8 @@ public static class TestData
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[0],
+            SessionId = SessionIds[7],
             TrackingCode = Websites[1].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddDays(-6).AddHours(12).AddMinutes(4),
@@ -320,11 +358,12 @@ public static class TestData
             ScreenHeight = 1080,
             BrowserLanguage = "ru-RU",
         },
+        // Сессия 8: Mac пользователь (ClientIds[1]), блог
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[1],
+            SessionId = SessionIds[8],
             TrackingCode = Websites[1].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddDays(-5).AddHours(10).AddMinutes(30),
@@ -339,8 +378,8 @@ public static class TestData
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[1],
+            SessionId = SessionIds[8],
             TrackingCode = Websites[1].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddDays(-5).AddHours(10).AddMinutes(33),
@@ -352,11 +391,12 @@ public static class TestData
             ScreenHeight = 768,
             BrowserLanguage = "ru-RU",
         },
+        // Сессия 9: iPhone пользователь (ClientIds[2]), блог
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[2],
+            SessionId = SessionIds[9],
             TrackingCode = Websites[1].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddDays(-4).AddHours(9).AddMinutes(15),
@@ -372,8 +412,8 @@ public static class TestData
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[2],
+            SessionId = SessionIds[9],
             TrackingCode = Websites[1].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddDays(-4).AddHours(9).AddMinutes(18),
@@ -386,11 +426,12 @@ public static class TestData
             ScreenHeight = 844,
             BrowserLanguage = "en-US",
         },
+        // Сессия 10: Windows пользователь (ClientIds[0]), блог второй визит
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[0],
+            SessionId = SessionIds[10],
             TrackingCode = Websites[1].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddDays(-3).AddHours(16).AddMinutes(45),
@@ -402,11 +443,12 @@ public static class TestData
             ScreenHeight = 1080,
             BrowserLanguage = "ru-RU",
         },
+        // Сессия 11: Mac пользователь (ClientIds[1]), блог второй визит
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[1],
+            SessionId = SessionIds[11],
             TrackingCode = Websites[1].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddDays(-2).AddHours(14).AddMinutes(20),
@@ -421,8 +463,8 @@ public static class TestData
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[1],
+            SessionId = SessionIds[11],
             TrackingCode = Websites[1].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddDays(-2).AddHours(14).AddMinutes(24),
@@ -434,11 +476,12 @@ public static class TestData
             ScreenHeight = 768,
             BrowserLanguage = "ru-RU",
         },
+        // Сессия 13: Гость (ClientIds[3]), блог сегодня
         new()
         {
             Id = Guid.NewGuid(),
-            ClientId = Guid.NewGuid(),
-            SessionId = Guid.NewGuid(),
+            ClientId = ClientIds[3],
+            SessionId = Guid.NewGuid(), // Новая сессия для гостя в блоге
             TrackingCode = Websites[1].TrackingCode,
             EventType = "page_view",
             Timestamp = DateTime.UtcNow.AddHours(-5),

@@ -13,12 +13,13 @@ namespace metrica_back.src.Repositories;
 public interface ITrackingEventRepository
 {
     Task CreateTrackingEventAsync(TrackingEvent trackingEvent);
+
     Task<int> GetTotalPageViewsAsync(int trackingCode, DateTime? from = null, DateTime? to = null);
     Task<List<IntervalPageViews>> GetIntervalPageViewsAsync(
         int trackingCode,
-        DateTime? from,
-        DateTime? to,
-        IntervalType? interval
+        DateTime? from = null,
+        DateTime? to = null,
+        IntervalType? interval = IntervalType.Weeks
     );
 }
 

@@ -13,8 +13,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      clickhouse:
-        condition: service_healthy
+      # clickhouse:
+      #   condition: service_healthy
       # redis:
       #   condition: service_healthy
       # rabbitmq:
@@ -44,27 +44,27 @@ services:
     networks:
       - metrica-network
 
-  clickhouse:
-    container_name: metrica-back-clickhouse
-    image: clickhouse/clickhouse-server:latest
-    ports:
-      - "8123:8123"
-      - "9000:9000"
-    environment:
-      CLICKHOUSE_USER: default
-      CLICKHOUSE_PASSWORD: password123
-      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
-    volumes:
-      - clickhouse_data:/var/lib/clickhouse
-    healthcheck:
-      test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
-    restart: unless-stopped
-    networks:
-      - metrica-network
+  # clickhouse:
+  #   container_name: metrica-back-clickhouse
+  #   image: clickhouse/clickhouse-server:latest
+  #   ports:
+  #     - "8123:8123"
+  #     - "9000:9000"
+  #   environment:
+  #     CLICKHOUSE_USER: default
+  #     CLICKHOUSE_PASSWORD: password123
+  #     CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+  #   volumes:
+  #     - clickhouse_data:/var/lib/clickhouse
+  #   healthcheck:
+  #     test: ["CMD", "clickhouse-client", "--query", "SELECT 1"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+  #     start_period: 15s
+  #   restart: unless-stopped
+  #   networks:
+  #     - metrica-network
 
   # redis:
   #   container_name: metrica-back-redis
@@ -108,8 +108,8 @@ services:
 volumes:
   postgres_data:
     driver: local
-  clickhouse_data:
-    driver: local
+  # clickhouse_data:
+  #   driver: local
   # redis_data:
   #   driver: local
   # rabbitmq_data:

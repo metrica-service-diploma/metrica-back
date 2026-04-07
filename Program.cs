@@ -1,21 +1,32 @@
-using metrica_back.src.Extensions;
+using metrica_back.src.External;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
+
+// Регистрация MediatR
+builder.Services.AddMediatR(cfg =>
+{
+    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+});
+
+// Регистрация AutoMapper
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
-builder.Services.AddCustomCors();
-builder.Services.AddCustomSwagger();
-builder.Services.AddCustomAuthentication(builder.Configuration);
-builder.Services.AddDatabase(builder.Configuration);
-builder.Services.AddRepositories();
-builder.Services.AddServices();
+builder.Services.AddInfrastructure(builder.Configuration);
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-await app.InitializeAllDatabasesAsync();
-app.ConfigurePipeline();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.MapControllers();
 
 await app.RunAsync();

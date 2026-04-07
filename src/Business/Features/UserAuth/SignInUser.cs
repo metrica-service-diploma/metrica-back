@@ -5,35 +5,37 @@ using metrica_back.src.Business.Helpers;
 using metrica_back.src.Core.Dtos;
 using metrica_back.src.Core.Interfaces.Repositories;
 using metrica_back.src.Core.Interfaces.Services;
+using metrica_back.src.Core.Models;
 
-namespace metrica_back.src.Business.Features;
+namespace metrica_back.src.Business.Features.UserAuth;
 
-public class SignInCommand : SignInRequestDto, IRequest<Result<SignInResponseDto>>
+public class SignInUserCommand : SignInRequestDto, IRequest<Result<SignInResponseDto>>
 {
-    public static SignInCommand FromDto(SignInRequestDto dto) =>
+    public static SignInUserCommand FromDto(SignInRequestDto dto) =>
         new() { Email = dto.Email, Password = dto.Password };
 };
 
-public class SignInCommandHandler(
+public class SignInUserCommandHandler(
     IUserRepository userRepository,
     ICurrentUserService currentUserService,
     IMapper mapper,
-    ILogger<SignInCommandHandler> logger
-) : IRequestHandler<SignInCommand, Result<SignInResponseDto>>
+    ILogger<SignInUserCommandHandler> logger
+) : IRequestHandler<SignInUserCommand, Result<SignInResponseDto>>
 {
     public async Task<Result<SignInResponseDto>> Handle(
-        SignInCommand request,
+        SignInUserCommand request,
         CancellationToken cancellationToken
     )
     {
-        // Поиск пользователя
-        var foundUser = await userRepository.GetByEmailAsync(request.Email);
+        // Получение пользователя
+        User? user = await userRepository.GetByEmailAsync(request.Email);
 
-        if (foundUser == null)
+        // Пользователь не найден
+        if (user == null)
             return Result<SignInResponseDto>.Failure("User not found", 404);
 
         // Проверка пароля
-        if (!PasswordHasher.Verify(request.Password, foundUser.PasswordHash))
+        if (!PasswordHasher.Verify(request.Password, user.PasswordHash))
             return Result<SignInResponseDto>.Failure("Invalid credentials", 401);
 
         logger.LogInformation("User {Email} successfully logged in", request.Email);
@@ -41,8 +43,8 @@ public class SignInCommandHandler(
         return Result<SignInResponseDto>.Success(
             new SignInResponseDto
             {
-                User = mapper.Map<UserResponseDto>(foundUser),
-                AccessToken = currentUserService.GetJwtSecurityToken(foundUser),
+                User = mapper.Map<UserResponseDto>(user),
+                AccessToken = currentUserService.GetJwtSecurityToken(user),
             }
         );
     }

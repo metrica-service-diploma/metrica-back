@@ -6,11 +6,11 @@ using metrica_back.src.Core.Dtos;
 using metrica_back.src.Core.Interfaces.Repositories;
 using metrica_back.src.Core.Models;
 
-namespace metrica_back.src.Business.Features;
+namespace metrica_back.src.Business.Features.UserAuth;
 
-public class SignUpCommand : SignUpRequestDto, IRequest<Result<UserResponseDto>>
+public class SignUpUserCommand : SignUpRequestDto, IRequest<Result<UserResponseDto>>
 {
-    public static SignUpCommand FromDto(SignUpRequestDto dto) =>
+    public static SignUpUserCommand FromDto(SignUpRequestDto dto) =>
         new()
         {
             UserName = dto.UserName,
@@ -19,14 +19,14 @@ public class SignUpCommand : SignUpRequestDto, IRequest<Result<UserResponseDto>>
         };
 };
 
-public class SignUpCommandHandler(
+public class SignUpUserCommandHandler(
     IUserRepository userRepository,
     IMapper mapper,
-    ILogger<SignUpCommandHandler> logger
-) : IRequestHandler<SignUpCommand, Result<UserResponseDto>>
+    ILogger<SignUpUserCommandHandler> logger
+) : IRequestHandler<SignUpUserCommand, Result<UserResponseDto>>
 {
     public async Task<Result<UserResponseDto>> Handle(
-        SignUpCommand request,
+        SignUpUserCommand request,
         CancellationToken cancellationToken
     )
     {

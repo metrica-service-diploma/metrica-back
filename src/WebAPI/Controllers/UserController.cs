@@ -1,5 +1,5 @@
 using MediatR;
-using metrica_back.src.Business.Features;
+using metrica_back.src.Business.Features.UserAuth;
 using metrica_back.src.Core.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,20 +9,20 @@ namespace metrica_back.src.WebAPI.Controllers;
 [Route("api/auth")]
 public class UserController(IMediator mediator)
 {
-    [HttpPost("sign-up")]
-    public async Task<IResult> SignUp([FromBody] SignUpRequestDto signUpRequestDto)
+    [HttpPost("sign-in")]
+    public async Task<IResult> SignIn([FromBody] SignInRequestDto signInRequestDto)
     {
-        var result = await mediator.Send(SignUpCommand.FromDto(signUpRequestDto));
+        var result = await mediator.Send(SignInUserCommand.FromDto(signInRequestDto));
 
         return result.IsSuccess
             ? Results.Ok(result.Data)
             : Results.Json(new { message = result.Error }, statusCode: result.StatusCode);
     }
 
-    [HttpPost("sign-in")]
-    public async Task<IResult> SignIn([FromBody] SignInRequestDto signInRequestDto)
+    [HttpPost("sign-up")]
+    public async Task<IResult> SignUp([FromBody] SignUpRequestDto signUpRequestDto)
     {
-        var result = await mediator.Send(SignInCommand.FromDto(signInRequestDto));
+        var result = await mediator.Send(SignUpUserCommand.FromDto(signUpRequestDto));
 
         return result.IsSuccess
             ? Results.Ok(result.Data)

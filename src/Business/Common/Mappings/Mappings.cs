@@ -1,8 +1,8 @@
 using AutoMapper;
-using metrica_back.src.Core.Dtos;
-using metrica_back.src.Core.Models;
+using metrica_back.src.Business.DTOs;
+using metrica_back.src.Domain.Models;
 
-namespace metrica_back.src.Core.Mappings;
+namespace metrica_back.src.Business.Common.Mappings;
 
 public class UserProfile : Profile
 {

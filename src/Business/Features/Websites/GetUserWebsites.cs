@@ -1,9 +1,9 @@
 using AutoMapper;
 using MediatR;
 using metrica_back.src.Business.Common;
-using metrica_back.src.Core.Dtos;
-using metrica_back.src.Core.Interfaces.Repositories;
-using metrica_back.src.Core.Interfaces.Services;
+using metrica_back.src.Business.DTOs;
+using metrica_back.src.Business.Interfaces.Repositories;
+using metrica_back.src.Business.Interfaces.Services;
 
 namespace metrica_back.src.Business.Features.Websites;
 

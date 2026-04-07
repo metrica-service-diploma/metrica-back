@@ -1,4 +1,4 @@
-using metrica_back.src.Core.Models;
+using metrica_back.src.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace metrica_back.src.External.Databases.PostgreSql;

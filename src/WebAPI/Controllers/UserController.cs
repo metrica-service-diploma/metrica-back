@@ -1,6 +1,6 @@
 using MediatR;
+using metrica_back.src.Business.DTOs;
 using metrica_back.src.Business.Features.UserAuth;
-using metrica_back.src.Core.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
 namespace metrica_back.src.WebAPI.Controllers;

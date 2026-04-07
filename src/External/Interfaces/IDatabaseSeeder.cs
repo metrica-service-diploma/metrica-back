@@ -1,4 +1,4 @@
-namespace metrica_back.src.Core.Interfaces.Services;
+namespace metrica_back.src.External.Interfaces;
 
 public interface IDatabaseSeeder
 {

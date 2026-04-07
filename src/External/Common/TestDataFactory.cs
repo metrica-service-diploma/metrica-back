@@ -1,6 +1,6 @@
-using metrica_back.src.Core.Models;
+using metrica_back.src.Domain.Models;
 
-namespace metrica_back.src.Core.Data;
+namespace metrica_back.src.External.Common;
 
 public static class TestDataFactory
 {

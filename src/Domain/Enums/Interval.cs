@@ -1,4 +1,4 @@
-namespace metrica_back.src.Core.Enums;
+namespace metrica_back.src.Domain.Enums;
 
 public enum Interval
 {

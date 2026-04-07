@@ -1,4 +1,4 @@
-using metrica_back.src.Core.Enums;
+using metrica_back.src.Domain.Enums;
 
 namespace metrica_back.src.Business.Helpers;
 

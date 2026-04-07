@@ -1,4 +1,4 @@
-namespace metrica_back.src.Core.Models;
+namespace metrica_back.src.Domain.Models;
 
 public class User
 {

@@ -1,6 +1,8 @@
-using metrica_back.src.Core.Interfaces.Repositories;
-using metrica_back.src.Core.Interfaces.Services;
+using metrica_back.src.Business.Interfaces.Repositories;
+using metrica_back.src.Business.Interfaces.Services;
 using metrica_back.src.External.Databases.PostgreSql;
+using metrica_back.src.External.HostedServices;
+using metrica_back.src.External.Interfaces;
 using metrica_back.src.External.Repositories;
 using metrica_back.src.External.Services;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +16,7 @@ public static class DependencyInjection
         IConfiguration configuration
     )
     {
-        // Подключение БД
+        // Подключение БД PostgreSQL
         services.AddDbContext<PostgreSqlContext>(options =>
             options.UseNpgsql(configuration.GetConnectionString("PostgreSql"))
         );
@@ -27,8 +29,8 @@ public static class DependencyInjection
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
 
-        // Хостированный сервис для автоматического сидинга при старте
-        services.AddHostedService<DatabaseInitializationHostedService>();
+        // Хостированные сервисы
+        services.AddHostedService<DatabaseInitHostedService>();
 
         return services;
     }

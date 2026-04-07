@@ -1,7 +1,7 @@
 using metrica_back.src.Business.Helpers;
-using metrica_back.src.Core.Interfaces.Services;
-using metrica_back.src.Core.Models;
+using metrica_back.src.Domain.Models;
 using metrica_back.src.External.Databases.PostgreSql;
+using metrica_back.src.External.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace metrica_back.src.External.Services;

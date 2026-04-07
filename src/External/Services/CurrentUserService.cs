@@ -1,8 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using metrica_back.src.Core.Interfaces.Services;
-using metrica_back.src.Core.Models;
+using metrica_back.src.Business.Interfaces.Services;
+using metrica_back.src.Domain.Models;
 using Microsoft.IdentityModel.Tokens;
 
 namespace metrica_back.src.External.Services;

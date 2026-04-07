@@ -1,6 +1,6 @@
-using metrica_back.src.Core.Models;
+using metrica_back.src.Domain.Models;
 
-namespace metrica_back.src.Core.Interfaces.Services;
+namespace metrica_back.src.Business.Interfaces.Services;
 
 public interface ICurrentUserService
 {

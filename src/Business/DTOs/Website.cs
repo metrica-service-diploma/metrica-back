@@ -1,4 +1,4 @@
-namespace metrica_back.src.Core.Dtos;
+namespace metrica_back.src.Business.DTOs;
 
 public class WebsiteResponseDto
 {

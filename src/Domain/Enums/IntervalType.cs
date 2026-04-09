@@ -1,6 +1,6 @@
 namespace metrica_back.src.Domain.Enums;
 
-public enum Interval
+public enum IntervalType
 {
     Days,
     Weeks,

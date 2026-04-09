@@ -4,13 +4,15 @@ namespace metrica_back.src.Business.Helpers;
 
 public static class TrackingEventsHelper
 {
-    public static (int intervalValue, string intervalType) GetIntervalParameters(Interval interval)
+    public static (int intervalValue, string intervalType) GetIntervalParameters(
+        IntervalType intervalType
+    )
     {
-        return interval switch
+        return intervalType switch
         {
-            Interval.Days => (1, "DAY"),
-            Interval.Weeks => (1, "WEEK"),
-            Interval.Months => (1, "MONTH"),
+            IntervalType.Days => (1, "DAY"),
+            IntervalType.Weeks => (1, "WEEK"),
+            IntervalType.Months => (1, "MONTH"),
             _ => (1, "WEEK"),
         };
     }

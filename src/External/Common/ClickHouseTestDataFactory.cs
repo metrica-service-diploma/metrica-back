@@ -2,16 +2,18 @@ using metrica_back.src.Domain.Models;
 
 namespace metrica_back.src.External.Common;
 
-public static class TestDataFactory
+public static class ClickHouseTestDataFactory
 {
-    private static readonly Dictionary<string, Guid> FixedIds = new()
+    private static readonly Dictionary<string, Guid> ClientIds = new()
     {
-        // Клиенты
         ["client_windows"] = Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
         ["client_mac"] = Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
         ["client_iphone"] = Guid.Parse("cccccccc-cccc-cccc-cccc-cccccccccccc"),
         ["client_guest"] = Guid.Parse("dddddddd-dddd-dddd-dddd-dddddddddddd"),
+    };
 
+    private static readonly Dictionary<string, Guid> SessionIds = new()
+    {
         // Сессии магазина
         ["session_shop_win_day1"] = Guid.Parse("11111111-1111-1111-1111-111111111111"),
         ["session_shop_win_day2"] = Guid.Parse("22222222-2222-2222-2222-222222222222"),
@@ -33,15 +35,15 @@ public static class TestDataFactory
 
     public static List<TrackingEvent> CreateTestData()
     {
-        var events = new List<TrackingEvent>();
-        var now = DateTime.UtcNow;
+        DateTime dateNow = DateTime.UtcNow;
+        List<TrackingEvent> trackingEvents = [];
 
         // Магазин - Сессия 1: Windows пользователь, первый визит
-        events.AddRange(
+        trackingEvents.AddRange(
             CreateShopEvents(
-                clientId: FixedIds["client_windows"],
-                sessionId: FixedIds["session_shop_win_day1"],
-                startTime: now.AddDays(-7).AddHours(10),
+                clientId: ClientIds["client_windows"],
+                sessionId: SessionIds["session_shop_win_day1"],
+                startTime: dateNow.AddDays(-7).AddHours(10),
                 pages: ["/", "/catalog", "/product/1"],
                 titles: ["Главная", "Каталог", "Товар 1"],
                 userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -51,11 +53,11 @@ public static class TestDataFactory
         );
 
         // Магазин - Сессия 2: Windows пользователь, второй визит
-        events.AddRange(
+        trackingEvents.AddRange(
             CreateShopEvents(
-                clientId: FixedIds["client_windows"],
-                sessionId: FixedIds["session_shop_win_day2"],
-                startTime: now.AddDays(-4).AddHours(16).AddMinutes(45),
+                clientId: ClientIds["client_windows"],
+                sessionId: SessionIds["session_shop_win_day2"],
+                startTime: dateNow.AddDays(-4).AddHours(16).AddMinutes(45),
                 pages: ["/", "/blog"],
                 titles: ["Главная", "Блог магазина"],
                 userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -65,11 +67,11 @@ public static class TestDataFactory
         );
 
         // Магазин - Сессия 3: Mac пользователь
-        events.AddRange(
+        trackingEvents.AddRange(
             CreateShopEvents(
-                clientId: FixedIds["client_mac"],
-                sessionId: FixedIds["session_shop_mac"],
-                startTime: now.AddDays(-6).AddHours(14).AddMinutes(30),
+                clientId: ClientIds["client_mac"],
+                sessionId: SessionIds["session_shop_mac"],
+                startTime: dateNow.AddDays(-6).AddHours(14).AddMinutes(30),
                 pages: ["/", "/catalog"],
                 titles: ["Главная", "Каталог"],
                 userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
@@ -80,11 +82,11 @@ public static class TestDataFactory
         );
 
         // Магазин - Сессия 4: iPhone пользователь
-        events.AddRange(
+        trackingEvents.AddRange(
             CreateShopEvents(
-                clientId: FixedIds["client_iphone"],
-                sessionId: FixedIds["session_shop_iphone"],
-                startTime: now.AddDays(-5).AddHours(9).AddMinutes(15),
+                clientId: ClientIds["client_iphone"],
+                sessionId: SessionIds["session_shop_iphone"],
+                startTime: dateNow.AddDays(-5).AddHours(9).AddMinutes(15),
                 pages: ["/", "/catalog", "/product/2"],
                 titles: ["Главная", "Каталог", "Товар 2"],
                 userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15",
@@ -95,11 +97,11 @@ public static class TestDataFactory
         );
 
         // Блог - Сессия 1: Windows пользователь
-        events.AddRange(
+        trackingEvents.AddRange(
             CreateBlogEvents(
-                clientId: FixedIds["client_windows"],
-                sessionId: FixedIds["session_blog_win"],
-                startTime: now.AddDays(-6).AddHours(12),
+                clientId: ClientIds["client_windows"],
+                sessionId: SessionIds["session_blog_win"],
+                startTime: dateNow.AddDays(-6).AddHours(12),
                 pages: ["/", "/article/1"],
                 titles: ["Главная блога", "Первая статья"],
                 userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -109,11 +111,11 @@ public static class TestDataFactory
         );
 
         // Блог - Сессия 2: Mac пользователь
-        events.AddRange(
+        trackingEvents.AddRange(
             CreateBlogEvents(
-                clientId: FixedIds["client_mac"],
-                sessionId: FixedIds["session_blog_mac"],
-                startTime: now.AddDays(-5).AddHours(10).AddMinutes(30),
+                clientId: ClientIds["client_mac"],
+                sessionId: SessionIds["session_blog_mac"],
+                startTime: dateNow.AddDays(-5).AddHours(10).AddMinutes(30),
                 pages: ["/", "/article/2"],
                 titles: ["Главная блога", "Вторая статья"],
                 userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
@@ -124,11 +126,11 @@ public static class TestDataFactory
         );
 
         // Блог - Сессия 3: iPhone пользователь
-        events.AddRange(
+        trackingEvents.AddRange(
             CreateBlogEvents(
-                clientId: FixedIds["client_iphone"],
-                sessionId: FixedIds["session_blog_iphone"],
-                startTime: now.AddDays(-4).AddHours(9).AddMinutes(15),
+                clientId: ClientIds["client_iphone"],
+                sessionId: SessionIds["session_blog_iphone"],
+                startTime: dateNow.AddDays(-4).AddHours(9).AddMinutes(15),
                 pages: ["/", "/article/3"],
                 titles: ["Главная блога", "Третья статья"],
                 userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15",
@@ -139,11 +141,11 @@ public static class TestDataFactory
         );
 
         // Гостевые визиты (сегодня)
-        events.Add(
+        trackingEvents.Add(
             CreateShopEvent(
-                clientId: FixedIds["client_guest"],
-                sessionId: FixedIds["session_shop_guest"],
-                createdAt: now.AddHours(-3),
+                clientId: ClientIds["client_guest"],
+                sessionId: SessionIds["session_shop_guest"],
+                createdAt: dateNow.AddHours(-3),
                 pageUrl: "/catalog",
                 pageTitle: "Каталог",
                 userAgent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
@@ -152,12 +154,11 @@ public static class TestDataFactory
                 referrer: "https://google.com"
             )
         );
-
-        events.Add(
+        trackingEvents.Add(
             CreateBlogEvent(
-                clientId: FixedIds["client_guest"],
-                sessionId: FixedIds["session_blog_guest"],
-                createdAt: now.AddHours(-5),
+                clientId: ClientIds["client_guest"],
+                sessionId: SessionIds["session_blog_guest"],
+                createdAt: dateNow.AddHours(-5),
                 pageUrl: "/",
                 pageTitle: "Главная блога",
                 userAgent: "Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15",
@@ -168,7 +169,7 @@ public static class TestDataFactory
             )
         );
 
-        return events;
+        return trackingEvents;
     }
 
     private static List<TrackingEvent> CreateShopEvents(

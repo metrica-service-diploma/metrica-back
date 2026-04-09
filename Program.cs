@@ -1,25 +1,32 @@
 using metrica_back.src.External;
+using metrica_back.src.External.Configs;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 
 // Регистрация MediatR
-builder.Services.AddMediatR(cfg =>
+builder.Services.AddMediatR(config =>
 {
-    cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+    config.RegisterServicesFromAssembly(typeof(Program).Assembly);
 });
 
 // Регистрация AutoMapper
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
+builder.Services.AddCustomCors();
+builder.Services.AddCustomAuthentication(builder.Configuration);
+builder.Services.AddCustomSwagger();
+
 builder.Services.AddInfrastructure(builder.Configuration);
 
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
 var app = builder.Build();
+
+app.UseCors();
+app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
 
 if (app.Environment.IsDevelopment())
 {

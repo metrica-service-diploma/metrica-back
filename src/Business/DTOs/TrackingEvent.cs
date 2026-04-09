@@ -27,3 +27,29 @@ public class PageViewsResponseDto
     public int TotalPageViews { get; set; }
     public List<IntervalPageViewsDto> IntervalPageViews { get; set; }
 }
+
+public class IntervalVisitsDto
+{
+    public int Visits { get; set; }
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
+}
+
+public class VisitsResponseDto
+{
+    public int TotalVisits { get; set; }
+    public List<IntervalVisitsDto> IntervalVisits { get; set; }
+}
+
+public class IntervalVisitorsDto
+{
+    public int Visitors { get; set; }
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
+}
+
+public class VisitorsResponseDto
+{
+    public int TotalVisitors { get; set; }
+    public List<IntervalVisitorsDto> IntervalVisitors { get; set; }
+}

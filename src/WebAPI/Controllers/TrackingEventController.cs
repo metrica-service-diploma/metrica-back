@@ -42,4 +42,38 @@ public class TrackingEventController(IMediator mediator)
             ? Results.Ok(result.Data)
             : Results.Json(new { message = result.Error }, statusCode: result.StatusCode);
     }
+
+    [HttpGet("website/{trackingCode}/visits")]
+    public async Task<IResult> GetVisits(
+        int trackingCode,
+        [FromQuery] DateTime? fromDate = null,
+        [FromQuery] DateTime? toDate = null,
+        [FromQuery] IntervalType? intervalType = null
+    )
+    {
+        var result = await mediator.Send(
+            new GetVisitsQuery(trackingCode, fromDate, toDate, intervalType)
+        );
+
+        return result.IsSuccess
+            ? Results.Ok(result.Data)
+            : Results.Json(new { message = result.Error }, statusCode: result.StatusCode);
+    }
+
+    [HttpGet("website/{trackingCode}/visitors")]
+    public async Task<IResult> GetVisitors(
+        int trackingCode,
+        [FromQuery] DateTime? fromDate = null,
+        [FromQuery] DateTime? toDate = null,
+        [FromQuery] IntervalType? intervalType = null
+    )
+    {
+        var result = await mediator.Send(
+            new GetVisitorsQuery(trackingCode, fromDate, toDate, intervalType)
+        );
+
+        return result.IsSuccess
+            ? Results.Ok(result.Data)
+            : Results.Json(new { message = result.Error }, statusCode: result.StatusCode);
+    }
 }

@@ -2,14 +2,12 @@ using MediatR;
 using metrica_back.src.Business.DTOs;
 using metrica_back.src.Business.Features.TrackingEvents;
 using metrica_back.src.Domain.Enums;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace metrica_back.src.WebAPI.Controllers;
 
 [ApiController]
 [Route("api/events")]
-[Authorize]
 public class TrackingEventController(IMediator mediator)
 {
     [HttpPost]

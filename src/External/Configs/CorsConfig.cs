@@ -10,8 +10,10 @@ public static class CorsConfig
             {
                 policy
                     .WithMethods("GET", "POST", "PUT", "DELETE")
-                    .AllowAnyOrigin()
-                    .AllowAnyHeader();
+                    .SetIsOriginAllowed(origin => true)
+                    .AllowAnyHeader()
+                    .AllowCredentials();
+                ;
             });
         });
 

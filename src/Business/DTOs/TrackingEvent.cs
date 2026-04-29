@@ -1,5 +1,7 @@
 namespace metrica_back.src.Business.DTOs;
 
+// TODO: Добавить EventType
+
 public class CreateTrackingEventRequestDto
 {
     public Guid ClientId { get; set; }
